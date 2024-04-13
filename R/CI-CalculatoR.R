@@ -92,6 +92,8 @@ CICalculatoR <- function(input){
           
           courseAllocation %<>% mutate(NESFactor = NA)
           
+          courseAllocation_NES <- courseAllocation[0,]
+          
           for(code in labLectureCodes){
             
             course <- courseAllocation %>%
@@ -99,25 +101,28 @@ CICalculatoR <- function(input){
             
             lecture <- course %>%
               filter(`Lecture/Lab/Stage` == "Lecture") %>%
+              group_by(Code) %>%
+              summarise(Hours = sum(Hours),
+                        `Students/section` = sum(`Students/section`)) %>%
               mutate(NESFactor = ifelse(Hours > 2, 1, 0))
             
             lab <- course %>%
               filter(`Lecture/Lab/Stage` == "Lab") %>%
               arrange(desc(`Students/section`)) %>%
               mutate(cumStudents = cumsum(`Students/section`),
-                     extraLab = (cumStudents > sum(lecture$`Students/section`) | (sum(lecture$NESFactor) == 0)),
-                     NESFactor = ifelse(extraLab & (Hours > 2), 1, 0))
+                     extraLab = (cumStudents > sum(lecture$`Students/section`) | (sum(lecture$NESFactor) == 0))) %>%
+              filter(extraLab) %>%
+              group_by(Code) %>%
+              summarise(Hours = sum(Hours),
+                        `Students/section` = sum(`Students/section`)) %>%
+              mutate(NESFactor = ifelse(Hours > 2, 1, 0))
             
             course <- bind_rows(lecture, lab)
             
-            courseAllocation %<>%
-              full_join(., course[,c("ID", "NESFactor")], by=c("ID", "NESFactor")) %>%
-              group_by(ID) %>%
-              mutate(NESFactor = first(na.omit(NESFactor))) %>%
-              filter(!is.na(Code))
+            courseAllocation_NES %<>% bind_rows(., course)
           }
           
-          NES <- courseAllocation %>%
+          NES <- courseAllocation_NES %>%
             filter(NESFactor == 1) %>%
             pull(`Students/section`) %>%
             sum()
