@@ -128,8 +128,8 @@ CICalculatoR <- function(input){
               pull(Hours) %>%
               sum()
             
-            extraStudents <- labStudents - lectureStudents %>%
-              {ifelse(. < 0, 0, .)}
+            extraStudents <- labStudents - lectureStudents
+            extraStudents <- ifelse(extraStudents < 0, 0, extraStudents)
             
             labNES <- ifelse(lectureNES == 0,
                              ifelse(labHours > 2,
