@@ -62,9 +62,6 @@ CICalculatoR <- function(input){
           finalCI <- 0
           
         }else{
-          
-          courseAllocation %<>%
-            mutate(ID = 1:nrow(.))
         
           # Calculate prep factor
           prepFactor <- courseAllocation %>%
@@ -84,7 +81,7 @@ CICalculatoR <- function(input){
                    StageCI = ifelse(`Lecture/Lab/Stage` == "Stage", (`Students/section`/Nejk)*0.89*40, 0))
           
           # Calculate Total PES
-          totalPES <- sum(courseAllocation$PES)
+          totalPES <- sum(courseAllocation$PES, na.rm=T)
           
           # Calculate PES CI
           PESCI <- min(415, totalPES)*0.04 + max(0, (totalPES-415))*0.07
@@ -157,10 +154,10 @@ CICalculatoR <- function(input){
           NES160CI <- (NES160^2)*0.1
           
           # Calculate Sub-Total CI
-          subTotalCI <- sum(courseAllocation$CI) + PESCI + NES75CI + NES160CI
+          subTotalCI <- sum(courseAllocation$CI, na.rm=T) + PESCI + NES75CI + NES160CI
           
           # Calculate Stage CI
-          stage <- sum(courseAllocation$StageCI)
+          stage <- sum(courseAllocation$StageCI, na.rm=T)
           
           # Calculate Release CI
           release <- teachers %>%
