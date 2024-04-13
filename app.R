@@ -50,7 +50,7 @@ ui <- page_sidebar(
     h5("3. Upload your form to the app"),
     h5("4. Click `Calculate CI`"),
     h5("5. Click `Download`"),
-    h1("", style = "padding:10px"),
+    h1(""),
     h6(tags$a(href = "https://github.com/chloedebyser/CEGEP-CI-CalculatoR",
               icon("github", "fa-2x")),
        "Source code"),
