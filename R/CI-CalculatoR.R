@@ -26,10 +26,16 @@ CICalculatoR <- function(input){
     unique() %>%
     sort()
   
-  # Header style
+  # Styles
+        # Header
   headerStyle <- createStyle(
     textDecoration = "bold",
     fgFill = "#F2F2F2"
+  )
+  
+        # Totals
+  totalStyle <- createStyle(
+    textDecoration = "bold"
   )
   
   # Processing
@@ -173,7 +179,11 @@ CICalculatoR <- function(input){
   }
   
   # Format output
-  teachers %<>% select(-ends_with(".Release"))
+  teachers %<>%
+    select(-ends_with(".Release")) %>%
+    bind_rows(summarise(.,
+                        across(where(is.numeric), sum),
+                        across(where(is.character), ~"Total")))
   
   # Add tab to input spreadsheet
   removeWorksheet(wb, sheet = "README")
@@ -186,6 +196,10 @@ CICalculatoR <- function(input){
      addStyle(wb, sheet = sheet, headerStyle, rows = 1, cols = 1:ncols, gridExpand = TRUE)
      setColWidths(wb, sheet, cols = 1:ncols, widths = 14)
      freezePane(wb, sheet, firstRow = TRUE, firstCol = FALSE)
+     
+     if(sheet == "CI Results"){
+       addStyle(wb, sheet = sheet, totalStyle, rows = nrow(teachers)+1, cols = 1:ncols, gridExpand = TRUE)
+     }
   }
   
   # Return spreadsheet
