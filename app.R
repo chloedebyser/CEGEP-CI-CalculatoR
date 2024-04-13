@@ -49,43 +49,33 @@ ui <- page_sidebar(
     h5("2. Enter your course allocations as per instructions in the README tab"),
     h5("3. Upload your form to the app"),
     h5("4. Click `Calculate CI`"),
-    h5("5. Your CI results will download automatically"),
-    br(),
-    br(),
-    br(),
-    br(),
-    br(),
-    br(),
-    br(),
-    br(),
-    br(),
-    br(),
-    h6("Source code",
-       tags$a(href = "https://github.com/chloedebyser/CEGEP-CI-CalculatoR",
-              icon("github", "fa-2x"))),
+    h5("5. Click `Download`"),
+    h1("", style = "padding:10px"),
+    h6(tags$a(href = "https://github.com/chloedebyser/CEGEP-CI-CalculatoR",
+              icon("github", "fa-2x")),
+       "Source code"),
     tags$style(".fa-github {color:#13294B}"),
     open="always"
     ),
   
-  layout_columns(
-    fileInput("file",
+  fileInput("file",
               label = h3(tags$b("Upload your course allocation form")),
               placeholder = "or drop files here",
               multiple = F,
               accept = c(".xlsx"),
-              width = 700)
-  ),
-  tags$div(uiOutput("runButton"), align = "center"),
-  br(),
-  tags$div(downloadButton("downloadData", "Download"), align = "center")
+              width = 1000),
+  
+  tags$div(uiOutput("runButton"), align = "center", style = "padding:20px"),
+  tags$div(downloadButton("downloadData", "Download"), align = "center"),
+  br()
 )
 
 # Server function
 server <- function(input, output){
   
-  source("R/CI-CalculatoR.R")
-  
   hide("downloadData")
+  
+  source("R/CI-CalculatoR.R")
   
   file_df <- reactive({
     req(input$file)
@@ -101,6 +91,9 @@ server <- function(input, output){
   
   observeEvent(input$runScript, {
     
+    disable("runScript")
+    hide("downloadData")
+    
     r$convertRes <- CICalculatoR(input = file_df()$datapath)
     
     show("downloadData")
@@ -109,8 +102,6 @@ server <- function(input, output){
       filename = "CI Results.xlsx",
       content = function(file) {saveWorkbook(r$convertRes, file, overwrite = T)}
     )
-    
-    outputOptions(output, "downloadData", suspendWhenHidden = FALSE)
   }, ignoreNULL = TRUE, ignoreInit = TRUE)
 }
 
