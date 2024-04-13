@@ -103,12 +103,14 @@ server <- function(input, output){
     
     r$convertRes <- CICalculatoR(input = file_df()$datapath)
     
-    runjs("$('#downloadData')[0].click();")
+    show("downloadData")
     
     output$downloadData <- downloadHandler(
       filename = "CI Results.xlsx",
       content = function(file) {saveWorkbook(r$convertRes, file, overwrite = T)}
     )
+    
+    outputOptions(output, "downloadData", suspendWhenHidden = FALSE)
   }, ignoreNULL = TRUE, ignoreInit = TRUE)
 }
 
