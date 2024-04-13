@@ -77,14 +77,15 @@ ui <- page_sidebar(
   ),
   tags$div(uiOutput("runButton"), align = "center"),
   br(),
-  conditionalPanel(condition = "false",
-                   tags$div(downloadButton("downloadData", "Download"), align = "center"))
+  tags$div(downloadButton("downloadData", "Download"), align = "center")
 )
 
 # Server function
 server <- function(input, output){
   
   source("R/CI-CalculatoR.R")
+  
+  hide("downloadData")
   
   file_df <- reactive({
     req(input$file)
