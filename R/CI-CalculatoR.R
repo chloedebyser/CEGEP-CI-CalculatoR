@@ -171,18 +171,16 @@ CICalculatoR <- function(input){
   teachers %<>% select(-ends_with(".Release"))
   
   # Add tab to input spreadsheet
+  removeWorksheet(wb, sheet = "README")
   addWorksheet(wb, "CI Results")
   writeData(wb, sheet = "CI Results", x = teachers)
   
   # Format sheets
   for(sheet in sheets(wb)){
-    
-    if(!sheet == "README"){
-      ncols <- ncol(read.xlsx(wb, sheet))
-      addStyle(wb, sheet = sheet, headerStyle, rows = 1, cols = 1:ncols, gridExpand = TRUE)
-      setColWidths(wb, sheet, cols = 1:ncols, widths = 14)
-      freezePane(wb, sheet, firstRow = TRUE, firstCol = FALSE)
-    }
+     ncols <- ncol(read.xlsx(wb, sheet))
+     addStyle(wb, sheet = sheet, headerStyle, rows = 1, cols = 1:ncols, gridExpand = TRUE)
+     setColWidths(wb, sheet, cols = 1:ncols, widths = 14)
+     freezePane(wb, sheet, firstRow = TRUE, firstCol = FALSE)
   }
   
   # Return spreadsheet
