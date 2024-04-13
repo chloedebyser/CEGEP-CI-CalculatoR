@@ -65,6 +65,7 @@ CICalculatoR <- function(input){
         
           # Calculate prep factor
           prepFactor <- courseAllocation %>%
+            filter(!`Lecture/Lab/Stage` == "Stage") %>%
             pull(Code) %>%
             unique() %>%
             length() %>%
