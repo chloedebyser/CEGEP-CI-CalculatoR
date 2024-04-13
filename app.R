@@ -10,6 +10,8 @@ library(shinyjs)
 # User interface  
 ui <- page_sidebar(
   
+  shinyjs::useShinyjs(),
+  
   theme = shinytheme("cosmo"),
   
   title = h1("CEGEP CI Calculator"),
@@ -46,7 +48,7 @@ ui <- page_sidebar(
     h5("1. Download the", tags$a(href="https://github.com/chloedebyser/CEGEP-CI-CalculatoR/raw/main/Course%20allocation%20template.xlsx", "course allocation template form")),
     h5("2. Enter your course allocations as per instructions in the README tab"),
     h5("3. Upload your form to the app"),
-    h5("4. Click `Caculate CI`"),
+    h5("4. Click `Calculate CI`"),
     h5("5. Your CI results will download automatically"),
     br(),
     br(),
@@ -75,7 +77,7 @@ ui <- page_sidebar(
   ),
   tags$div(uiOutput("runButton"), align = "center"),
   br(),
-  conditionalPanel(condition = "input.runScript == 1",
+  conditionalPanel(condition = "false",
                    tags$div(downloadButton("downloadData", "Download"), align = "center"))
 )
 
@@ -91,7 +93,7 @@ server <- function(input, output){
   
   output$runButton <- renderUI({
     if(is.null(file_df())) return()
-    actionButton("runScript", "Caculate CI", style = "border-color: darkgrey !important")
+    actionButton("runScript", "Calculate CI", style = "border-color: darkgrey !important")
   })
   
   r <- reactiveValues(convertRes = NULL)
@@ -99,6 +101,8 @@ server <- function(input, output){
   observeEvent(input$runScript, {
     
     r$convertRes <- CICalculatoR(input = file_df()$datapath)
+    
+    runjs("$('#downloadData')[0].click();")
     
     output$downloadData <- downloadHandler(
       filename = "CI Results.xlsx",
