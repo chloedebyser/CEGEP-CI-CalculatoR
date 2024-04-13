@@ -121,7 +121,7 @@ CICalculatoR <- function(input){
               group_by(Code) %>%
               summarise(Hours = sum(Hours),
                         `Students/section` = sum(`Students/section`)) %>%
-              mutate(NESFactor = ifelse(lecture$NESFactor == 1, 1, ifelse(Hours > 2, 1, 0)))
+              mutate(NESFactor = ifelse((nrow(lecture)>0) && (lecture$NESFactor == 1), 1, ifelse(Hours > 2, 1, 0)))
             
             course <- bind_rows(lecture, lab)
             
