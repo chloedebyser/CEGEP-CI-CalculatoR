@@ -96,42 +96,53 @@ CICalculatoR <- function(input){
             unique() %>%
             sort()
           
-          courseAllocation %<>% mutate(NESFactor = NA)
-          
-          courseAllocation_NES <- courseAllocation[0,]
+          NES <- 0
           
           for(code in labLectureCodes){
             
+            # Get course information
             course <- courseAllocation %>%
               filter(Code == code)
             
-            lecture <- course %>%
+            # Compute lecture NES
+            lectureStudents <- course %>%
               filter(`Lecture/Lab/Stage` == "Lecture") %>%
-              group_by(Code) %>%
-              summarise(Hours = sum(Hours),
-                        `Students/section` = sum(`Students/section`)) %>%
-              mutate(NESFactor = ifelse(Hours > 2, 1, 0))
+              pull(`Students/section`) %>%
+              sum()
             
-            lab <- course %>%
+            lectureHours <- course %>%
+              filter(`Lecture/Lab/Stage` == "Lecture") %>%
+              pull(Hours) %>%
+              sum()
+            
+            lectureNES <- ifelse(lectureHours > 2, lectureStudents, 0)
+            
+            # Compute lab NES
+            labStudents <- course %>%
               filter(`Lecture/Lab/Stage` == "Lab") %>%
-              arrange(desc(`Students/section`)) %>%
-              mutate(cumStudents = cumsum(`Students/section`),
-                     extraLab = (cumStudents > sum(lecture$`Students/section`) | (sum(lecture$NESFactor) == 0))) %>%
-              filter(extraLab) %>%
-              group_by(Code) %>%
-              summarise(Hours = sum(Hours),
-                        `Students/section` = sum(`Students/section`)) %>%
-              mutate(NESFactor = ifelse((nrow(lecture)>0) && (lecture$NESFactor == 1), 1, ifelse(Hours > 2, 1, 0)))
+              pull(`Students/section`) %>%
+              sum()
             
-            course <- bind_rows(lecture, lab)
+            labHours <- course %>%
+              filter(`Lecture/Lab/Stage` == "Lab") %>%
+              pull(Hours) %>%
+              sum()
             
-            courseAllocation_NES %<>% bind_rows(., course)
+            extraStudents <- labStudents - lectureStudents %>%
+              {ifelse(. < 0, 0, .)}
+            
+            labNES <- ifelse(lectureNES == 0,
+                             ifelse(labHours > 2,
+                                    labStudents,
+                                    0),
+                             extraStudents)
+            
+            # Total course NES
+            courseNES <- lectureNES + labNES
+            
+            # Total NES
+            NES <- NES + courseNES
           }
-          
-          NES <- courseAllocation_NES %>%
-            filter(NESFactor == 1) %>%
-            pull(`Students/section`) %>%
-            sum()
           
           # Calculate NES 75
           NES75 <- ifelse(NES < 75, 0, NES)
