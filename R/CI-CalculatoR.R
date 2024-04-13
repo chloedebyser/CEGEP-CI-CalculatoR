@@ -65,7 +65,7 @@ CICalculatoR <- function(input){
             pull(Code) %>%
             unique() %>%
             length() %>%
-            {ifelse(. < 3, 0.9, ifelse(. == 3, 1.1, 1.9))}
+            {ifelse(. < 3, 0.9, ifelse(. == 3, 1.1, 1.75))}
           
           # Calculate HP
           courseAllocation %<>%
