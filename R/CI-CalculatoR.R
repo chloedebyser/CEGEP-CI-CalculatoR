@@ -113,7 +113,11 @@ CICalculatoR <- function(input){
               pull(Hours) %>%
               sum()
             
-            lectureNES <- ifelse(lectureHours > 2, lectureStudents, 0)
+            lectureNES <- ifelse(lectureHours == 2,
+                                 lectureStudents * 0.8,
+                                 ifelse(lectureHours > 2,
+                                        lectureStudents,
+                                        0))
             
             # Compute lab NES
             labStudents <- course %>%
@@ -130,9 +134,11 @@ CICalculatoR <- function(input){
             extraStudents <- ifelse(extraStudents < 0, 0, extraStudents)
             
             labNES <- ifelse(lectureNES == 0,
-                             ifelse(labHours > 2,
-                                    labStudents,
-                                    0),
+                             ifelse(labHours == 2,
+                                    labStudents * 0.8,
+                                    ifelse(labHours > 2,
+                                           labStudents,
+                                           0)),
                              extraStudents)
             
             # Total course NES
@@ -160,16 +166,18 @@ CICalculatoR <- function(input){
           # Calculate Stage CI
           stage <- sum(courseAllocation$StageCI, na.rm=T)
           
-          # Calculate Release CI
-          release <- teachers %>%
-            filter(Last.Name == teacher) %>%
-            pull(paste0(semester, ".Release")) %>%
-            {ifelse(is.na(.), 0, .)} %>%
-            {.*40}
-          
           # Calculate CI
-          finalCI <- subTotalCI + stage + release
+          finalCI <- subTotalCI + stage
         }
+        
+        # Add Release CI
+        release <- teachers %>%
+          filter(Last.Name == teacher) %>%
+          pull(paste0(semester, ".Release")) %>%
+          {ifelse(is.na(.), 0, .)} %>%
+          {.*40}
+        
+        finalCI <- finalCI + release
         
         # Add CI to teachers table
         teachers %<>%
