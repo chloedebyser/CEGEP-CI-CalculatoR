@@ -113,11 +113,11 @@ CICalculatoR <- function(input){
               pull(Hours) %>%
               sum()
             
-            lectureNES <- ifelse(lectureHours == 2,
-                                 lectureStudents * 0.8,
-                                 ifelse(lectureHours > 2,
-                                        lectureStudents,
-                                        0))
+            lectureNES <- ifelse(lectureHours < 2,
+                                 0,
+                                 ifelse(lectureHours < 3,
+                                        lectureStudents * 0.8,
+                                        lectureStudents))
             
             # Compute lab NES
             labStudents <- course %>%
@@ -134,11 +134,11 @@ CICalculatoR <- function(input){
             extraStudents <- ifelse(extraStudents < 0, 0, extraStudents)
             
             labNES <- ifelse(lectureNES == 0,
-                             ifelse(labHours == 2,
-                                    labStudents * 0.8,
-                                    ifelse(labHours > 2,
-                                           labStudents,
-                                           0)),
+                             ifelse(labHours < 2,
+                                    0,
+                                    ifelse(labHours < 3,
+                                           labStudents * 0.8,
+                                           labStudents)),
                              extraStudents)
             
             # Total course NES
