@@ -45,7 +45,7 @@ ui <- page_sidebar(
   sidebar = sidebar(
     br(),
     h4(tags$b("How to use this application")),
-    h5("1. Download the", tags$a(href="https://github.com/chloedebyser/CEGEP-CI-CalculatoR/raw/main/Course%20allocation%20template.xlsx", "course allocation template"), "and", tags$a(href="https://github.com/chloedebyser/CEGEP-CI-CalculatoR/blob/main/Course%20allocation%20example.xlsx", "example"), "forms"),
+    h5("1. Download the", tags$a(href="https://github.com/chloedebyser/CEGEP-CI-CalculatoR/raw/main/Course%20allocation%20template.xlsx", "course allocation template"), "and", tags$a(href="https://github.com/chloedebyser/CEGEP-CI-CalculatoR/raw/main/Course%20allocation%20example.xlsx", "example"), "forms"),
     h5("2. Enter your course allocations as per instructions in the README tab"),
     h5("3. Upload your form to the app"),
     h5("4. Click `Calculate CI`"),
